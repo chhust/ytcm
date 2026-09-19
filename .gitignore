@@ -1,0 +1,17 @@
+*
+
+!.gitignore
+!LICENSE
+!logo.png
+!README.md
+!YTCM101.md
+!YTCM102.md
+!YTCM.py
+!pyproject.toml
+!requirements.txt
+!uv.lock
+!YOUTUBE.API.example
+
+!src/
+!src/**/
+!src/**/*.py
