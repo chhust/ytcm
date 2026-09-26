@@ -397,12 +397,12 @@ def plot_channel_clustering_heatmap(matrix, max_channels=400, cluster_max=None, 
 
     def auto_settings(profiles):
         """
-        Derive simple heuristics from sparsity and skewness.
+        Derive simple heuristics from density and skewness.
         """
 
         n_rows, n_cols = profiles.shape
-        nnz = (profiles.values != 0).sum()                             # sparsity of the raw matrix (fraction of non-zeros)
-        sparsity = nnz / (n_rows * n_cols) if n_rows * n_cols > 0 else 0.0
+        nnz = (profiles.values != 0).sum()                             # density of the raw matrix (fraction of non-zeros)
+        density = nnz / (n_rows * n_cols) if n_rows * n_cols > 0 else 0.0
         row_sum = pd.Series(profiles.sum(axis=1))                      # skewness of row activity (heavy tails suggest log1p)
         skew = float(row_sum.skew()) if len(row_sum) else 0.0
 
@@ -410,10 +410,10 @@ def plot_channel_clustering_heatmap(matrix, max_channels=400, cluster_max=None, 
         varying = float((np.std(profiles.values.astype(float), axis=1) > 0).mean()) if n_rows else 0.0
 
         s["transform"] = "log1p" if skew > 1.0 else "none"
-        s["similarity"] = "corr" if (sparsity >= 0.10 and varying >= 0.5) else "cosine"
-        s["clip_vmax"] = "p99" if sparsity < 0.10 else "p995"
+        s["similarity"] = "corr" if (density >= 0.10 and varying >= 0.5) else "cosine"
+        s["clip_vmax"] = "p99" if density < 0.10 else "p995"
 
-        return s, {"sparsity": sparsity, "skew": skew}
+        return s, {"density": density, "skew": skew}
 
     def apply_transform(profiles, how):
         """
@@ -491,7 +491,7 @@ def plot_channel_clustering_heatmap(matrix, max_channels=400, cluster_max=None, 
             clip_vmax = auto_s["clip_vmax"]
         skew_text = ("undefined" if np.isnan(stats["skew"])
                      else f"≈ {stats['skew']:.2f}")
-        print(f"[auto] sparsity ≈ {stats['sparsity']:.3f}, skew {skew_text} → "
+        print(f"[auto] density ≈ {stats['density']:.3f}, skew {skew_text} → "
               f"transform={transform}, similarity={similarity}, clip_vmax={clip_vmax}")
 
     if cluster_max is None:
